@@ -1,0 +1,26 @@
+{
+  "name": "react-ga-onetrust-consent",
+  "version": "1.0.0",
+  "description": "React implementation of OneTrust consent banner integrated with Google Analytics signals.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "jaydonkrooss",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaydonkrooss/react-ga-onetrust-consent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jaydonkrooss/react-ga-onetrust-consent/issues"
+  },
+  "homepage": "https://github.com/jaydonkrooss/react-ga-onetrust-consent#readme",
+  "dependencies": {
+    "js-cookie": "^3.0.5",
+    "react": "^18.3.1",
+    "react-ga4": "^2.1.0",
+    "react-router-dom": "^6.25.1"
+  }
+}
