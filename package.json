@@ -2,7 +2,7 @@
   "name": "react-ga-onetrust-consent",
   "version": "1.0.0",
   "description": "React implementation of OneTrust consent banner integrated with Google Analytics signals.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
