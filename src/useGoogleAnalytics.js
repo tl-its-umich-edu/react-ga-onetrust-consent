@@ -8,9 +8,9 @@ export const GoogleAnalyticsConsentValue = {
     Granted: "granted"
 };
 
-export const useGoogleAnalytics = (googleAnalyticsId, debug, oneTrustScriptDomain) => {
+export const useGoogleAnalytics = ({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }) => {
     let location = useLocation();
-    const [initializeOneTrust] = useOneTrust(oneTrustScriptDomain);
+    const [initializeOneTrust] = useOneTrust({oneTrustScriptDomain, nonce});
 
     const [initialized, setInitialized] = useState(false);
     const [previousPage, setPreviousPage] = useState(null);
@@ -25,7 +25,14 @@ if (googleAnalyticsId && !initialized) {
             ad_personalization: GoogleAnalyticsConsentValue.Denied,
             wait_for_update: 500
         });
-        GoogleAnalytics.initialize(googleAnalyticsId, { testMode: debug });
+        GoogleAnalytics.initialize([{
+            trackingId: gaId,
+            gaOptions: {
+              cookieFlags: 'SameSite=None; Secure',
+              testMode: debug ? true : false,
+              ...(nonce && { nonce: nonce }) 
+            }
+          }]);
         if (initializeOneTrust) {
           initializeOneTrust(GoogleAnalytics);
         }

@@ -1,3 +1,3 @@
-import useGoogleAnalytics from './useGoogleAnalytics';
+import { useGoogleAnalytics } from './useGoogleAnalytics';
 
 export default useGoogleAnalytics;

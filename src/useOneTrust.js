@@ -12,7 +12,7 @@ const OneTrustCookieCategory = {
 };
   
 
-export const useOneTrust = (oneTrustScriptDomain) => 
+export const useOneTrust = ({ oneTrustScriptDomain, nonce }) => 
   {
     // Loads the script for OneTrust consent banner implementation, & handles Google Analytics event tracking
     // Instructions for UofM implementation: https://vpcomm.umich.edu/resources/cookie-disclosure/#3rd-party-google-analytics
@@ -55,6 +55,9 @@ export const useOneTrust = (oneTrustScriptDomain) =>
         script.src = src;
         script.type = 'text/javascript';
         script.dataset.domainScript = oneTrustScriptDomain;
+        if (nonce) {
+            script.nonce = nonce;
+        }
         document.head.appendChild(script);
     }
 
