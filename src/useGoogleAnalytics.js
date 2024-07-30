@@ -26,7 +26,7 @@ if (googleAnalyticsId && !initialized) {
             wait_for_update: 500
         });
         GoogleAnalytics.initialize([{
-            trackingId: gaId,
+            trackingId: googleAnalyticsId,
             gaOptions: {
               cookieFlags: 'SameSite=None; Secure',
               testMode: debug ? true : false,
