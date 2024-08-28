@@ -1,5 +1,5 @@
 {
-  "name": "react-ga-onetrust-consent",
+  "name": "@tl-its-umich-edu/react-ga-onetrust-consent",
   "version": "1.0.0",
   "description": "React implementation of OneTrust consent banner integrated with Google Analytics signals.",
   "main": "src/index.js",
@@ -11,12 +11,27 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jaydonkrooss/react-ga-onetrust-consent.git"
+    "url": "https://github.com/tl-its-umich-edu/react-ga-onetrust-consent.git"
+  },
+  "publishConfig": {
+    "@tl-its-umich-edu:registry": "https://npm.pkg.github.com"
   },
   "bugs": {
-    "url": "https://github.com/jaydonkrooss/react-ga-onetrust-consent/issues"
+    "url": "https://github.com/tl-its-umich-edu/react-ga-onetrust-consent/issues"
   },
-  "homepage": "https://github.com/jaydonkrooss/react-ga-onetrust-consent#readme",
+  "homepage": "https://github.com/tl-its-umich-edu/react-ga-onetrust-consent#readme",
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom"
+    ]
+  },
   "dependencies": {
     "jest-environment-jsdom": "29.7.0",
     "js-cookie": "3.0.5",
