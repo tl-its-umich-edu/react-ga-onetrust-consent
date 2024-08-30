@@ -121,7 +121,7 @@ Where `update_type` is either patch, minor, or major. The corresponding number i
 
 Once the pull request is merged, the most recent commit on master should be tagged for release. Using the npm iterated package version, create an associated tag, for example:
 
- ```git tag -a vMAJOR.MINOR.PATCH```
+ ```git tag vMAJOR.MINOR.PATCH```
 
 Where `MAJOR`, `MINOR`, and `PATCH` are the corresponding numbers of the new npm version Then push the tags to the repository: 
 
