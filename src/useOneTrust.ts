@@ -7,7 +7,7 @@ declare global {
       OnetrustActiveGroups?: string;
       OptanonWrapper?: () => void;
     }
-  }
+  };
 
 // Cookies defined according to the UofM OneTrust cookies disclosure: https://vpcomm.umich.edu/resources/cookie-disclosure/
 // For more info on cookie management, see OneTrust's documentation: https://my.onetrust.com/s/article/UUID-2dc719a8-4be5-8d16-1dc8-c7b4147b88e0?language=en_US 
@@ -22,7 +22,7 @@ const OneTrustCookieCategory = {
 interface UseOneTrustParams {
     oneTrustScriptDomain?: string;
     nonce?: string | undefined;
-  }
+  };
 
 export const useOneTrust = ({ oneTrustScriptDomain, nonce }: UseOneTrustParams): [(googleAnalytics:GA4) => void] | [] => 
   {

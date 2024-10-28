@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { useGoogleAnalytics, GoogleAnalyticsConsentValue } from './useGoogleAnalytics';
 import GoogleAnalytics from 'react-ga4';
@@ -14,10 +14,10 @@ describe('useGoogleAnalytics', () => {
   const oneTrustScriptDomain = 'test-domain';
 
   beforeEach(() => {
-    GoogleAnalytics.initialize.mockClear();
-    GoogleAnalytics.gtag.mockClear();
-    GoogleAnalytics.send.mockClear();
-    useOneTrust.mockReturnValue([jest.fn()]);
+    (GoogleAnalytics.initialize as jest.Mock).mockClear();
+    (GoogleAnalytics.gtag as jest.Mock).mockClear();
+    (GoogleAnalytics.send as jest.Mock).mockClear();
+    (useOneTrust as jest.Mock).mockReturnValue([jest.fn()]);
   });
 
   it('initializes Google Analytics with correct options', () => {
@@ -57,7 +57,7 @@ describe('useGoogleAnalytics', () => {
 
   it('calls initializeOneTrust with GoogleAnalytics', () => {
     const initializeOneTrust = jest.fn();
-    useOneTrust.mockReturnValue([initializeOneTrust]);
+    (useOneTrust as jest.Mock).mockReturnValue([initializeOneTrust]);
 
     renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }), {
       wrapper: MemoryRouter,

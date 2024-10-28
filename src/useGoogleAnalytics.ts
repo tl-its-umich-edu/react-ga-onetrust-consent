@@ -6,14 +6,14 @@ import { useOneTrust } from './useOneTrust';
 export enum GoogleAnalyticsConsentValue {
     Denied = "denied",
     Granted = "granted"
-}
+};
 
 interface UseGoogleAnalyticsParams {
     googleAnalyticsId?: string;
     debug?: boolean;
     nonce?: string;
     oneTrustScriptDomain?: string;
-}
+};
 
 export const useGoogleAnalytics = ({
     googleAnalyticsId,
