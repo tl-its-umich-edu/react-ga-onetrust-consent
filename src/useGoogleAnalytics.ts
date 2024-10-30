@@ -25,7 +25,7 @@ export const useGoogleAnalytics = ({
     const [initializeOneTrust] = useOneTrust({ oneTrustScriptDomain, nonce });
 
     const [initialized, setInitialized] = useState(false);
-    const [previousPage, setPreviousPage] = useState<any>(null);
+    const [previousPage, setPreviousPage] = useState<string>('');
 
     if (googleAnalyticsId && !initialized) {
         GoogleAnalytics.gtag("consent", "default", {
