@@ -1,5 +1,13 @@
+import { GA4 } from 'react-ga4/types/ga4';
 import Cookies from "js-cookie";
 import { GoogleAnalyticsConsentValue } from './useGoogleAnalytics';
+
+declare global {
+    interface Window {
+      OnetrustActiveGroups?: string;
+      OptanonWrapper?: () => void;
+    }
+  };
 
 // Cookies defined according to the UofM OneTrust cookies disclosure: https://vpcomm.umich.edu/resources/cookie-disclosure/
 // For more info on cookie management, see OneTrust's documentation: https://my.onetrust.com/s/article/UUID-2dc719a8-4be5-8d16-1dc8-c7b4147b88e0?language=en_US 
@@ -11,12 +19,16 @@ const OneTrustCookieCategory = {
     SocialMedia: "C0005",
 };
   
+interface UseOneTrustParams {
+    oneTrustScriptDomain?: string;
+    nonce?: string | undefined;
+  };
 
-export const useOneTrust = ({ oneTrustScriptDomain, nonce }) => 
+export const useOneTrust = ({ oneTrustScriptDomain, nonce }: UseOneTrustParams): [(googleAnalytics:GA4) => void] | [] => 
   {
     // Loads the script for OneTrust consent banner implementation, & handles Google Analytics event tracking
     // Instructions for UofM implementation: https://vpcomm.umich.edu/resources/cookie-disclosure/#3rd-party-google-analytics
-    const initializeOneTrust = (googleAnalytics) => {
+    const initializeOneTrust = (googleAnalytics: GA4) => {
         // Callback to update Google Analytics consent tags and remove cookies based on OneTrust active groups
         // OneTrust documentation: https://developer.onetrust.com/onetrust/docs/using-google-consent-mode
         const updateGtagCallback = () => {
@@ -63,3 +75,4 @@ export const useOneTrust = ({ oneTrustScriptDomain, nonce }) =>
 
     return [ initializeOneTrust ];
 };
+

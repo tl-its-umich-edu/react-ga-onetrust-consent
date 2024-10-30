@@ -3,19 +3,31 @@ import GoogleAnalytics from 'react-ga4';
 import { useLocation } from 'react-router-dom';
 import { useOneTrust } from './useOneTrust';
 
-export const GoogleAnalyticsConsentValue = {
-    Denied: "denied",
-    Granted: "granted"
+export enum GoogleAnalyticsConsentValue {
+    Denied = "denied",
+    Granted = "granted"
 };
 
-export const useGoogleAnalytics = ({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }) => {
-    let location = useLocation();
-    const [initializeOneTrust] = useOneTrust({oneTrustScriptDomain, nonce});
+interface UseGoogleAnalyticsParams {
+    googleAnalyticsId?: string;
+    debug?: boolean;
+    nonce?: string;
+    oneTrustScriptDomain?: string;
+};
+
+export const useGoogleAnalytics = ({
+    googleAnalyticsId,
+    debug,
+    nonce,
+    oneTrustScriptDomain
+}: UseGoogleAnalyticsParams) => {
+    const location = useLocation();
+    const [initializeOneTrust] = useOneTrust({ oneTrustScriptDomain, nonce });
 
     const [initialized, setInitialized] = useState(false);
-    const [previousPage, setPreviousPage] = useState(null);
-    
-if (googleAnalyticsId && !initialized) {
+    const [previousPage, setPreviousPage] = useState<string>('');
+
+    if (googleAnalyticsId && !initialized) {
         GoogleAnalytics.gtag("consent", "default", {
             ad_storage: GoogleAnalyticsConsentValue.Denied,
             analytics_storage: GoogleAnalyticsConsentValue.Denied,
@@ -28,13 +40,13 @@ if (googleAnalyticsId && !initialized) {
         GoogleAnalytics.initialize([{
             trackingId: googleAnalyticsId,
             gaOptions: {
-              cookieFlags: 'SameSite=None; Secure',
-              testMode: debug ? true : false,
-              ...(nonce && { nonce: nonce }) 
+                cookieFlags: 'SameSite=None; Secure',
+                testMode: debug ? true : false,
+                ...(nonce && { nonce: nonce }) 
             }
-          }]);
+        }]);
         if (initializeOneTrust) {
-          initializeOneTrust(GoogleAnalytics);
+            initializeOneTrust(GoogleAnalytics);
         }
         setInitialized(true);
     }
@@ -46,4 +58,4 @@ if (googleAnalyticsId && !initialized) {
             GoogleAnalytics.send({ hitType: "pageview", page });
         }
     }, [location, previousPage, googleAnalyticsId]);
-}
+};
