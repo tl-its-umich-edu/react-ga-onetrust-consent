@@ -4,8 +4,10 @@
 name: Node.js Package
 
 on:
-  release:
-    types: [created]
+  workflow_run:
+    workflows: ["Create Release"]  # Matches the name in release.yml
+    types:
+      - completed  # Runs only when release.yml completes successfully
 
 jobs:
   build:
