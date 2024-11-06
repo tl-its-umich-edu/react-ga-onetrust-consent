@@ -19,12 +19,15 @@ const OneTrustCookieCategory = {
     SocialMedia: "C0005",
 };
   
-interface UseOneTrustParams {
+type UseOneTrustParams = {
     oneTrustScriptDomain?: string;
     nonce?: string | undefined;
   };
 
-export const useOneTrust = ({ oneTrustScriptDomain, nonce }: UseOneTrustParams): [(googleAnalytics:GA4) => void] | [] => 
+export function useOneTrust ({ 
+  oneTrustScriptDomain, 
+  nonce 
+}: UseOneTrustParams): [(googleAnalytics:GA4) => void] | []  
   {
     // Loads the script for OneTrust consent banner implementation, & handles Google Analytics event tracking
     // Instructions for UofM implementation: https://vpcomm.umich.edu/resources/cookie-disclosure/#3rd-party-google-analytics

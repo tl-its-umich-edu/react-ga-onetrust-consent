@@ -1,3 +1,4 @@
-import { useGoogleAnalytics } from './useGoogleAnalytics';
+import { useGoogleAnalytics, UseGoogleAnalyticsParams } from './useGoogleAnalytics';
 
-export default useGoogleAnalytics;
+export type { UseGoogleAnalyticsParams };
+export { useGoogleAnalytics };
