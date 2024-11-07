@@ -8,6 +8,7 @@
     "build": "tsc",
     "test": "ts-jest --clearCache && jest"
   },
+  "files": ["dist/*", "src/*"],
   "keywords": [],
   "author": "jaydonkrooss",
   "license": "Apache-2.0",
