@@ -1,4 +1,4 @@
- local # react-ga-onetrust-consent
+# react-ga-onetrust-consent
 
 React implementation of OneTrust consent banner integrated with Google Analytics signals. Initially built to support analytics-enabled University of Michigan Teaching & Learning applications, this logic using Google Analytics tracking alongside OneTrust consent verification is written to be properly standardized; We will aim to iterate on this project such that it could be shared with other Umich web apps that utilize React and Google Analytics. 
 
@@ -25,21 +25,15 @@ Keep in mind that the consent banner has a privacy hyperlink that redirects to a
 
 
 # Installation
-The package is accessible via the GitHub Package Registry. To install, the npm command will require the exact version number of the package needed:
+The module for this code is currently only accessible via a direct link to the public github repository. For a safe installation, a git tag is needed in the URL:
 
 ```
 npm install https://github.com/tl-its-umich-edu/react-ga-onetrust-consent#MAJOR.MINOR.PATCH
 ```
 
-Where `MAJOR`, `MINOR`, and `PATCH` represent the corresponding numbers in the recent version of this package.
+`#MAJOR.MINOR.PATCH` represents a git tag from this project, where `MAJOR`, `MINOR`, and `PATCH` represent the corresponding numbers in the latest version iteration of the code. [See recent tags](https://github.com/tl-its-umich-edu/react-ga-onetrust-consent/tags) to pull the latest version. Alternatively, a branch name can be included here instead (useful for testing code updates in-progress).
 
-The above method does not follow protocols listed in the Github Packages documentation requiring a local `.npmrc` file. However, because this project is public, directly installing should be working as of 2024 (see [discussion](https://github.com/orgs/community/discussions/19037#discussioncomment-9579768)). If this method does not work in the future, developers may need to generate a personal access token for the purpose of installing Node packages from GPR. For more information, see the [npm Documentation for Github Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
-
-For Typescript projects, be sure to import the types:
-
-```
-npm install --save-dev @types/react-ga-onetrust-consent
-```
+This project was initially built to be released on the Github Package Repository (GPR). However, requiring a personal access token seemed too cumbersome for public usage. Directly installing the github repo is the selected alternative that was deemed sufficient as of 2024 (see [discussion](https://github.com/orgs/community/discussions/19037#discussioncomment-9579768)). Until the issues of GPR usage are fixed, there are no immediate plans to publish a publicly-accessible npm package.
 
 # Usage
 
@@ -94,7 +88,7 @@ const App = () => {
 export default App;
 ```
 
-alternatively, if your application is in Typescript:
+alternatively, if the application is in Typescript:
 
 ```
 
@@ -142,9 +136,9 @@ const Contact: React.FC = () => <div>Contact Page</div>;
 ```
 
 # Development
-To contribute to this package, follow the instructions below to set up the development environment.
+To contribute to this codebase, follow the instructions below to set up the development environment.
 
-**Build Steps**
+**Forking & Build Steps**
 
 Developers can choose to clone the repository: 
 
@@ -156,35 +150,50 @@ Or alternatively, developers can [create a fork](https://cli.github.com/manual/g
 
 Install dependencies: `npm install `
 
-Run the build: `npm run build `
+Run the build to compile typescript files: `npm run build `
+
+**Integration Testing**
+
+Once a branch with code changes is ready to test, developers can integrate the module into a separate codebase on their machine. 
+
+Use the same github installation technique from [Installation](#Installation) except use the `branch_name` instead of git tag, and the personal github username instead of the tl-its organization name (if working on a fork). On the other local project, install via github URL:
+
+```
+npm install https://github.com/<github-username>/react-ga-onetrust-consent#branch_name
+```
+
+At this point, the module can be imported and used the same way as in the [Usage](#Usage) section above.
+
 
 # Testing
 To run tests, use the following command:
 
 ```npm test ```
 
-We are using Jest as our testing framework, with `ts-jest` for additional typescript support. Make sure any new features or changes include appropriate tests.
+This project uses Jest as the testing framework, with `ts-jest` for additional typescript support. Make sure any new features or changes include appropriate tests.
 
-# Releasing
-We use GitHub Actions to automate the release and package publishing process. When the project is ready for a new package deployment, follow these steps:
+# Releasing, Versioning
+
+
+
+There is currently no implementation regarding releases and/or package publishing. The only versioning steps required are to update the npm package and create the corresponding tag. In the future this could be used to kick off a release and publishing step.
 
 While making code changes, make sure the npm package version is updated according to the added changes. 
 
 ```npm version <update_type>```
 
-Where `update_type` is either patch, minor, or major. The corresponding number in the version `MAJOR.MINOR.PATCH` will be incremented. See more about [semantic versioning](https://docs.npmjs.com/about-semantic-versioning#incrementing-semantic-versions-in-published-packages).
+Where `update_type` is either `patch`, `minor`, or `major`. The corresponding number in the version `MAJOR.MINOR.PATCH` will be automatically incremented and the change will commit to the branch. See more about [semantic versioning](https://docs.npmjs.com/about-semantic-versioning#incrementing-semantic-versions-in-published-packages).
 
-Once the pull request is merged, the most recent commit on master should be tagged for release. Using the npm iterated package version, create an associated tag, for example:
+Once the corresponding pull request is merged, the main branch can be tagged. Using the npm iterated package version, an associated tag can be created locally like so:
+ ```
+ git checkout main
+ git tag vMAJOR.MINOR.PATCH
+ ```
 
- ```git tag vMAJOR.MINOR.PATCH```
-
-Where `MAJOR`, `MINOR`, and `PATCH` are the corresponding numbers of the new npm version Then push the tags to the repository: 
+Where `MAJOR`, `MINOR`, and `PATCH` are the corresponding numbers of the new npm version. Then push the tags to the remote repository: 
 
 ```git push origin vMAJOR.MINOR.PATCH```
 
-Once a new tag is pushed, GitHub Actions will automatically create a new release based on the tag. The release creation will then kick off publishing workflow to Github Package Repository if the build succeeds and all tests pass.
-
-If any step of the publishing workflow fails, either try to remove the tag (both remote and locally) and re-instate the same version or start over the tagging process with another PATCH iteration.
 
 # License
 This project is licensed under the terms of the Apache-2.0 license. See the LICENSE file for details.

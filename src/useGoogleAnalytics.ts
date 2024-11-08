@@ -8,19 +8,19 @@ export enum GoogleAnalyticsConsentValue {
     Granted = "granted"
 };
 
-interface UseGoogleAnalyticsParams {
+export type UseGoogleAnalyticsParams = {
     googleAnalyticsId?: string;
     debug?: boolean;
     nonce?: string;
     oneTrustScriptDomain?: string;
 };
 
-export const useGoogleAnalytics = ({
+export function useGoogleAnalytics({
     googleAnalyticsId,
     debug,
     nonce,
     oneTrustScriptDomain
-}: UseGoogleAnalyticsParams) => {
+}: UseGoogleAnalyticsParams): void {
     const location = useLocation();
     const [initializeOneTrust] = useOneTrust({ oneTrustScriptDomain, nonce });
 
