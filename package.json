@@ -1,6 +1,6 @@
 {
   "name": "@tl-its-umich-edu/react-ga-onetrust-consent",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "React implementation of OneTrust consent banner integrated with Google Analytics signals.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
