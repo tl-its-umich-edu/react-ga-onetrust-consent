@@ -9,7 +9,10 @@
     "build": "tsc",
     "test": "ts-jest --clearCache && jest"
   },
-  "files": ["dist/*", "src/*"],
+  "files": [
+    "dist/*",
+    "src/*"
+  ],
   "keywords": [],
   "author": "jaydonkrooss",
   "license": "Apache-2.0",
@@ -36,7 +39,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-ga4": "2.1.0",
-    "react-router-dom": "6.25.1"
+    "react-router-dom": "6.28.2"
   },
   "devDependencies": {
     "@babel/core": "7.25.2",
