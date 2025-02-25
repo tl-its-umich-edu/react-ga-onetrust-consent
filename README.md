@@ -1,8 +1,8 @@
 # react-ga-onetrust-consent
 
-React implementation of OneTrust consent banner integrated with Google Analytics signals. Initially built to support analytics-enabled University of Michigan Teaching & Learning applications, this logic using Google Analytics tracking alongside OneTrust consent verification is written to be properly standardized; We will aim to iterate on this project such that it could be shared with other Umich web apps that utilize React and Google Analytics. 
+React tooling that enables Umich consent banner integrated with Google Analytics signals. Initially built to support analytics-enabled University of Michigan Teaching & Learning applications, this logic using Google Analytics tracking as well as consent approval/denial to be properly standardized; We will aim to iterate on this project such that it could be shared with other Umich web apps that utilize React and Google Analytics. 
 
-For more information on the University of Michigan's technical implementation of OneTrust, see the OVPC Digital team's [instructions on cookie disclosures](https://vpcomm.umich.edu/resources/cookie-disclosure/).
+For more information on the University of Michigan's technical implementation of the banner, see the OVPC Digital team's [instructions on cookie disclosures](https://vpcomm.umich.edu/resources/cookie-disclosure/).
 
 ## Table of Contents
 
@@ -17,11 +17,11 @@ For more information on the University of Michigan's technical implementation of
 # Overview
 
 
-React projects built with either Typescript or Javascript are able to utilize this code. Applications should import and apply the hook `useGoogleAnalytics` at the root level of App component. Upon initializing with the proper settings, this hook will call upon the `useOneTrust` hook which initializes the consent banner and captures user preferences.
+React projects built with either Typescript or Javascript are able to utilize this code. Applications should import and apply the hook `useGoogleAnalytics` at the root level of App component. Upon initializing with the proper settings, this hook will return handler functions that can be applied to the `useUmConsent` hook which initializes the consent banner and captures user preferences.
 
-Beyond simply loading a script for the banner, the `useOneTrust` hook also writes a callback to properly emit settings changes to Google Analytics and delete Google Analytics cookies if tracking is denied (EU countries only). To get a better understanding how OneTrust and Google Analytics work together, see the [UMich Google Analytics implementation instructions](https://vpcomm.umich.edu/resources/cookie-disclosure/#3rd-party-google-analytics).
+Upon calling the `initializeConsentManager` method from the `useUmConsent` hook, some configuration settings are given to customize the banner, including whether the banner runs for all users or only EU users, which is required by [GDPR](https://gdpr.eu/what-is-gdpr/). The handler functions `gaHandlers` will properly emit settings changes to Google Analytics and delete Google Analytics cookies if tracking is denied. To get a better understanding how Google Analytics works with this script, see the [UMich Google Analytics implementation instructions](https://vpcomm.umich.edu/resources/cookie-disclosure/#3rd-party-google-analytics).
 
-Keep in mind that the consent banner has a privacy hyperlink that redirects to a `/privacy/` path on the current application's web domain. Be sure to implement a privacy page or redirect the application appropriately.
+Keep in mind that the consent banner has a privacy hyperlink that, by default, redirects to a `/privacy/` path on the current application's web domain. This can be changed in the `initializeConsentManager` parameters, so be sure to implement a privacy page or redirect the application appropriately.
 
 
 # Installation
@@ -37,14 +37,11 @@ This project was initially built to be released on the Github Package Repository
 
 # Usage
 
-As explained in the [overview](#overview) above, the `useGoogleAnalytics` hook will run at the root of the App component. If the application uses `react-router`, be sure that App is a child of the router component such as `<Router>` or `<BrowserRouter>`.
+As explained in the [overview](#overview) above, the `useGoogleAnalytics` and `useUmConsent` hooks will run at the root of the App component. If the application uses `react-router-dom`, be sure that App is a child of the router component `<BrowserRouter>` (usually imported as `Router`). Before the use of the Google Analytics hook, be sure to have the proper Google Analytics Id for the project you are using. 
 
-Before the use of this code, prepare the variables necessary before the code runs any scripts:
-   1) Google Analytics Id
-   2) OneTrust Domain Script Id
-   3) Nonce (optional)
+For the U-M consent manager, settings such as `alwaysShow` and `developmentMode` can alter the behavior of the script. To learn more about these script settings see the [U-M Cookie Disclosure page](https://vpcomm.umich.edu/resources/cookie-disclosure/) under 'Banner Integration'.
 
-Here's an example of how this would be executed in an app using `react-router`:
+Here's an example of how this would be executed in an app using `react-router-dom`:
 
 ### index.js
 
@@ -70,11 +67,28 @@ import { Routes } from 'react-router-dom';
 import App from 'App'
 
 const App = () => { 
-    useGoogleAnalytics({ 
-        googleAnalyticsId: '<GOOGLE_ANALYTICS_ID>', 
-        oneTrustScriptDomain: '<ONETRUST_DOMAIN>', 
-        debug: false, 
-        nonce: '<NONCE>' });
+    const { gaInitialized, gaHandlers } = useGoogleAnalytics({
+    googleAnalyticsId: 'G-XXXXXXXX', // your Google Analytics ID
+    debug: false,
+  });
+
+  const { umConsentInitialize, umConsentInitialized } = useUmConsent();
+
+  if (
+    !umConsentInitialized &&
+    gaInitialized &&
+    gaHandlers.onConsentApprove &&
+    gaHandlers.onConsentReject
+  ) {
+    const consentParams = {
+      developmentMode: false,
+      alwaysShow: false,
+      onConsentApprove: gaHandlers.onConsentApprove,
+      onConsentReject: gaHandlers.onConsentReject,
+    };
+    umConsentInitialize(consentParams);
+  }
+
 
     return (
         <Routes>
@@ -98,23 +112,34 @@ import { Routes, Route } from 'react-router-dom';
 
 interface AppProps {
   googleAnalyticsId: string;
-  oneTrustScriptDomain: string;
   nonce?: string;
-  debug?: boolean;
 }
 
 const App: React.FC<AppProps> = ({
   googleAnalyticsId,
-  oneTrustScriptDomain,
   nonce,
-  debug = false,
 }) => {
-  useGoogleAnalytics({
-    googleAnalyticsId,
-    oneTrustScriptDomain,
-    nonce,
-    debug,
-  });
+  const { gaInitialized, gaHandlers } = useGoogleAnalytics({
+      googleAnalyticsId: 'G-XXXXXXXX', // your Google Analytics ID
+      debug: false,
+    });
+
+    const { umConsentInitialize, umConsentInitialized } = useUmConsent();    
+    if ( 
+      !umConsentInitialized &&
+      gaInitialized &&
+      gaHandlers.onConsentApprove &&
+      gaHandlers.onConsentReject
+      ) {
+        const consentParams: InitializeConsentManagerParams = {
+            developmentMode: false,
+            alwaysShow: false,
+            onConsentApprove: gaHandlers.onConsentApprove,
+            onConsentReject: gaHandlers.onConsentReject,
+        }
+        umConsentInitialize(consentParams);
+    }
+
 
   return (
     <Routes>
@@ -127,11 +152,6 @@ const App: React.FC<AppProps> = ({
 };
 
 export default App;
-
-// Example component imports
-const Home: React.FC = () => <div>Home Page</div>;
-const About: React.FC = () => <div>About Page</div>;
-const Contact: React.FC = () => <div>Contact Page</div>;
 
 ```
 
@@ -148,11 +168,22 @@ Or alternatively, developers can [create a fork](https://cli.github.com/manual/g
 
 ```gh repo fork https://github.com/tl-its-umich-edu/react-ga-onetrust-consent.git --clone```
 
-Install dependencies: `npm install `
+Install dependencies: `npm install`
 
-Run the build to compile typescript files: `npm run build `
+Run the build to compile javascript and typescript files: `npm run build`
 
-**Integration Testing**
+**Integration Testing: Local**
+
+During development, you can use the **test-app** directory to simulate a react application using the hooks in this module. Follow the [test-app README](/test-app/README.md) for detailed instructions on this.
+
+Installing this module to other local projects outside of this repo will require symlink using `npm link`. Similar to the **test-app** readme instructions, this module needs to directly link to the **react** and **react-router-dom** packages in your PROJECT's `node_modules` folder. 
+1. In the directory for this module, run: `npm link ../<path-to-PROJECT>/node_modules/react ../<path-to-PROJECT>/node_modules/react-router-dom`. Then `npm run build` to generate the needed JS/TS code
+2. In the same module directory run `npm link` to set a global npm link to the project name
+3. Then in the local project directory, install this module by running `npm link @tl-its-umich-edu/react-ga-onetrust-consent`
+
+Note: running `npm install` will undo links, and it is best to run `npm unlink` to properly sever the symlinks.
+
+**Integration Testing: Github Branch**
 
 Once a branch with code changes is ready to test, developers can integrate the module into a separate codebase on their machine. 
 
@@ -173,7 +204,6 @@ To run tests, use the following command:
 This project uses Jest as the testing framework, with `ts-jest` for additional typescript support. Make sure any new features or changes include appropriate tests.
 
 # Releasing, Versioning
-
 
 
 There is currently no implementation regarding releases and/or package publishing. The only versioning steps required are to update the npm package and create the corresponding tag. In the future this could be used to kick off a release and publishing step.

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import GoogleAnalytics from 'react-ga4';
+import Cookies from "js-cookie";
 import { useLocation } from 'react-router-dom';
-import { useOneTrust } from './useOneTrust';
 
 export enum GoogleAnalyticsConsentValue {
     Denied = "denied",
@@ -12,44 +12,85 @@ export type UseGoogleAnalyticsParams = {
     googleAnalyticsId?: string;
     debug?: boolean;
     nonce?: string;
-    oneTrustScriptDomain?: string;
+};
+
+type ConsentHandlers = {
+    approve: (() => void) | undefined;
+    reject: (() => void) | undefined;
+};
+
+type GoogleAnalyticsHookReturn = {
+    gaInitialized: boolean;
+    gaHandlers: {
+        onConsentApprove: (() => void) | undefined;
+        onConsentReject: (() => void) | undefined;
+    }
 };
 
 export function useGoogleAnalytics({
     googleAnalyticsId,
     debug,
     nonce,
-    oneTrustScriptDomain
-}: UseGoogleAnalyticsParams): void {
+}: UseGoogleAnalyticsParams): GoogleAnalyticsHookReturn {
     const location = useLocation();
-    const [initializeOneTrust] = useOneTrust({ oneTrustScriptDomain, nonce });
-
     const [initialized, setInitialized] = useState(false);
     const [previousPage, setPreviousPage] = useState<string>('');
+    const [consentHandlers, setConsentHandlers] = useState<ConsentHandlers>({
+        approve: undefined,
+        reject: undefined
+    });
+    useEffect(() => {
+        console.log('useGoogleAnalytics effect initialized', initialized);
+        console.log('useGoogleAnalytics effect googleAnalyticsId', googleAnalyticsId);
+        console.log('useGoogleAnalytics effect debug', debug);
+        console.log('useGoogleAnalytics effect nonce', nonce);
+        if (googleAnalyticsId && !initialized) {
+            GoogleAnalytics.gtag("consent", "default", {
+                ad_storage: GoogleAnalyticsConsentValue.Denied,
+                analytics_storage: GoogleAnalyticsConsentValue.Denied,
+                functional_storage: GoogleAnalyticsConsentValue.Denied,
+                personalization_storage: GoogleAnalyticsConsentValue.Denied,
+                ad_user_data: GoogleAnalyticsConsentValue.Denied,
+                ad_personalization: GoogleAnalyticsConsentValue.Denied,
+                wait_for_update: 500
+            });
+            GoogleAnalytics.initialize([{
+                trackingId: googleAnalyticsId,
+                gaOptions: {
+                    cookieFlags: 'SameSite=None; Secure',
+                    testMode: debug ? true : false,
+                    ...(nonce && { nonce: nonce }) 
+                }
+            }]);
 
-    if (googleAnalyticsId && !initialized) {
-        GoogleAnalytics.gtag("consent", "default", {
-            ad_storage: GoogleAnalyticsConsentValue.Denied,
-            analytics_storage: GoogleAnalyticsConsentValue.Denied,
-            functionality_storage: GoogleAnalyticsConsentValue.Denied,
-            personalization_storage: GoogleAnalyticsConsentValue.Denied,
-            ad_user_data: GoogleAnalyticsConsentValue.Denied,
-            ad_personalization: GoogleAnalyticsConsentValue.Denied,
-            wait_for_update: 500
-        });
-        GoogleAnalytics.initialize([{
-            trackingId: googleAnalyticsId,
-            gaOptions: {
-                cookieFlags: 'SameSite=None; Secure',
-                testMode: debug ? true : false,
-                ...(nonce && { nonce: nonce }) 
-            }
-        }]);
-        if (initializeOneTrust) {
-            initializeOneTrust(GoogleAnalytics);
+            setConsentHandlers({
+                approve: () => {
+                    console.log('useGoogleAnalytics approve handler run');
+                    GoogleAnalytics.gtag("consent", "update", {
+                        analytics_storage: GoogleAnalyticsConsentValue.Granted,
+                        functional_storage: GoogleAnalyticsConsentValue.Granted,
+                        ad_storage: GoogleAnalyticsConsentValue.Granted,
+                        ad_user_data: GoogleAnalyticsConsentValue.Granted,
+                        ad_personalization: GoogleAnalyticsConsentValue.Granted,
+                        personalization_storage: GoogleAnalyticsConsentValue.Granted
+                    });
+                    GoogleAnalytics.event({ action: 'um_consent_updated', category: 'consent' });
+                },
+                reject: () => {
+                    console.log('useGoogleAnalytics reject handler run');
+                    GoogleAnalytics.gtag("consent", "update", { 
+                        analytics_storage: GoogleAnalyticsConsentValue.Granted,
+                        functional_storage: GoogleAnalyticsConsentValue.Granted 
+                    });
+                    Cookies.remove("_ga");
+                    Cookies.remove("_gat");
+                    Cookies.remove("_gid");
+                    GoogleAnalytics.event({ action: 'um_consent_updated', category: 'consent' });
+                }
+            });
+            setInitialized(true);
         }
-        setInitialized(true);
-    }
+    }, [googleAnalyticsId, initialized, debug, nonce]);
 
     useEffect(() => {
         const page = location.pathname + location.search + location.hash;
@@ -58,4 +99,12 @@ export function useGoogleAnalytics({
             GoogleAnalytics.send({ hitType: "pageview", page });
         }
     }, [location, previousPage, googleAnalyticsId]);
-};
+
+    return {
+        gaInitialized: initialized,
+        gaHandlers: {
+            onConsentApprove: consentHandlers.approve,
+            onConsentReject: consentHandlers.reject
+        }
+    };
+}

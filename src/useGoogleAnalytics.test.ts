@@ -1,34 +1,33 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { useGoogleAnalytics, GoogleAnalyticsConsentValue } from './useGoogleAnalytics';
 import GoogleAnalytics from 'react-ga4';
-import { useOneTrust } from './useOneTrust';
+import Cookies from 'js-cookie';
 
 jest.mock('react-ga4');
-jest.mock('./useOneTrust');
+jest.mock('js-cookie');
 
 describe('useGoogleAnalytics', () => {
   const googleAnalyticsId = 'UA-XXXXXX-X';
   const debug = true;
   const nonce = 'test-nonce';
-  const oneTrustScriptDomain = 'test-domain';
 
   beforeEach(() => {
     (GoogleAnalytics.initialize as jest.Mock).mockClear();
     (GoogleAnalytics.gtag as jest.Mock).mockClear();
     (GoogleAnalytics.send as jest.Mock).mockClear();
-    (useOneTrust as jest.Mock).mockReturnValue([jest.fn()]);
+    (Cookies.remove as jest.Mock).mockClear();
   });
 
   it('initializes Google Analytics with correct options', () => {
-    renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }), {
+    renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce }), {
       wrapper: MemoryRouter,
     });
 
     expect(GoogleAnalytics.gtag).toHaveBeenCalledWith('consent', 'default', {
       ad_storage: GoogleAnalyticsConsentValue.Denied,
       analytics_storage: GoogleAnalyticsConsentValue.Denied,
-      functionality_storage: GoogleAnalyticsConsentValue.Denied,
+      functional_storage: GoogleAnalyticsConsentValue.Denied,
       personalization_storage: GoogleAnalyticsConsentValue.Denied,
       ad_user_data: GoogleAnalyticsConsentValue.Denied,
       ad_personalization: GoogleAnalyticsConsentValue.Denied,
@@ -46,7 +45,7 @@ describe('useGoogleAnalytics', () => {
   });
 
   it('tracks page views on location change', () => {
-    const { result, rerender } = renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }), {
+    const { result, rerender } = renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce }), {
       wrapper: MemoryRouter,
     });
 
@@ -55,14 +54,65 @@ describe('useGoogleAnalytics', () => {
     expect(GoogleAnalytics.send).toHaveBeenCalledWith({ hitType: 'pageview', page: '/' });
   });
 
-  it('calls initializeOneTrust with GoogleAnalytics', () => {
-    const initializeOneTrust = jest.fn();
-    (useOneTrust as jest.Mock).mockReturnValue([initializeOneTrust]);
-
-    renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce, oneTrustScriptDomain }), {
+  it('handles consent approval correctly', () => {
+    const { result } = renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce }), {
       wrapper: MemoryRouter,
     });
 
-    expect(initializeOneTrust).toHaveBeenCalledWith(GoogleAnalytics);
+    expect(GoogleAnalytics.gtag).toHaveBeenCalledWith('consent', 'default', {
+      analytics_storage: GoogleAnalyticsConsentValue.Denied,
+      functional_storage: GoogleAnalyticsConsentValue.Denied,
+      ad_storage: GoogleAnalyticsConsentValue.Denied,
+      ad_user_data: GoogleAnalyticsConsentValue.Denied,
+      ad_personalization: GoogleAnalyticsConsentValue.Denied,
+      personalization_storage: GoogleAnalyticsConsentValue.Denied,
+      wait_for_update: 500,
+    });
+
+    act(() => {
+      result.current.gaHandlers.onConsentApprove?.();
+    });
+
+    expect(GoogleAnalytics.gtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: GoogleAnalyticsConsentValue.Granted,
+      functional_storage: GoogleAnalyticsConsentValue.Granted,
+      ad_storage: GoogleAnalyticsConsentValue.Granted,
+      ad_user_data: GoogleAnalyticsConsentValue.Granted,
+      ad_personalization: GoogleAnalyticsConsentValue.Granted,
+      personalization_storage: GoogleAnalyticsConsentValue.Granted,
+    });
+
+    expect(GoogleAnalytics.event).toHaveBeenCalledWith({ action: 'um_consent_updated', category: 'consent' });
+  });
+
+  it('handles consent rejection correctly', () => {
+    const { result } = renderHook(() => useGoogleAnalytics({ googleAnalyticsId, debug, nonce }), {
+      wrapper: MemoryRouter,
+    });
+
+    expect(GoogleAnalytics.gtag).toHaveBeenCalledWith('consent', 'default', {
+      analytics_storage: GoogleAnalyticsConsentValue.Denied,
+      functional_storage: GoogleAnalyticsConsentValue.Denied,
+      ad_storage: GoogleAnalyticsConsentValue.Denied,
+      ad_user_data: GoogleAnalyticsConsentValue.Denied,
+      ad_personalization: GoogleAnalyticsConsentValue.Denied,
+      personalization_storage: GoogleAnalyticsConsentValue.Denied,
+      wait_for_update: 500,
+    });
+
+    act(() => {
+      result.current.gaHandlers.onConsentReject?.();
+    });
+
+    expect(GoogleAnalytics.gtag).toHaveBeenCalledWith('consent', 'update', {
+      analytics_storage: GoogleAnalyticsConsentValue.Granted,
+      functional_storage: GoogleAnalyticsConsentValue.Granted,
+    });
+    
+    expect(Cookies.remove).toHaveBeenCalledWith('_ga');
+    expect(Cookies.remove).toHaveBeenCalledWith('_gat');
+    expect(Cookies.remove).toHaveBeenCalledWith('_gid');
+
+    expect(GoogleAnalytics.event).toHaveBeenCalledWith({ action: 'um_consent_updated', category: 'consent' });
   });
 });
