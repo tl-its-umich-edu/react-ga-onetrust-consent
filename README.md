@@ -174,9 +174,9 @@ Run the build to compile javascript and typescript files: `npm run build`
 
 **Integration Testing: Local**
 
-During development, you can use the **test-app** directory to simulate a react application using the hooks in this module. Follow the [test-app README](/test-app/README.md) for detailed instructions on this.
+During development, you can use the **local-app** directory to simulate a react application using the hooks in this module. Follow the [local-app README](/local-app/README.md) for detailed instructions on this.
 
-Installing this module to other local projects outside of this repo will require symlink using `npm link`. Similar to the **test-app** readme instructions, this module needs to directly link to the **react** and **react-router-dom** packages in your PROJECT's `node_modules` folder. 
+Installing this module to other local projects outside of this repo will require symlink using `npm link`. Similar to the **local-app** readme instructions, this module needs to directly link to the **react** and **react-router-dom** packages in your PROJECT's `node_modules` folder. 
 1. In the directory for this module, run: `npm link ../<path-to-PROJECT>/node_modules/react ../<path-to-PROJECT>/node_modules/react-router-dom`. Then `npm run build` to generate the needed JS/TS code
 2. In the same module directory run `npm link` to set a global npm link to the project name
 3. Then in the local project directory, install this module by running `npm link @tl-its-umich-edu/react-ga-onetrust-consent`

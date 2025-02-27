@@ -1,8 +1,7 @@
-
-// Types for um consent manager object
-
 import { useState } from "react";
 
+// Types necessary for the U-M consent manager object
+// See https://vpcomm.umich.edu/resources/cookie-disclosure/ under Banner Integration 
 // Define base cookie type with required name field
 interface BaseCookie {
     name: string;  // Required: The name of the cookie
@@ -12,7 +11,7 @@ interface ExtendedCookie extends BaseCookie {
     domain?: string;  // Optional: The domain the cookie is set to
     regex?: string;   // Optional: Regular expression for auto-deletion matching
 }
-export type UmConsentManager = {
+type UmConsentManager = {
     mode: 'prod' | 'dev',
     customManager: {
         enabled: boolean,
@@ -36,21 +35,23 @@ declare global {
     }
 };
 
+// Utility function to append script to document head
+const appendScript = (srcUrl: string, nonce?: string) => {
+    const scriptElement = document.createElement('script');
+    scriptElement.src = srcUrl;
+    if (nonce) {
+        scriptElement.nonce = nonce;
+    }
+    document.head.appendChild(scriptElement);
+}
+
+// Parameters needed for returned umConsentInitialize function
 export type InitializeConsentManagerParams = {
     developmentMode?: boolean,
     alwaysShow?: boolean,
     privacyUrl?: string,
     onConsentApprove: () => void,
     onConsentReject: () => void,
-}
-
-const appendScript = (src: string, nonce?: string) => {
-    const script = document.createElement('script');
-    script.src = src;
-    if (nonce) {
-        script.nonce = nonce;
-    }
-    document.head.appendChild(script);
 }
 
 type UmConsentHookReturn = {
@@ -60,7 +61,7 @@ type UmConsentHookReturn = {
 
 export function useUmConsent() : UmConsentHookReturn {
     const [consentInitState, setConsentInitState] = useState<boolean>(false)
-    console.log("useUmConsent initialized", consentInitState)
+    const umConsentSrcUrl = 'https://umich.edu/apis/umconsentmanager/consentmanager.js'
 
     const initializeConsentManager = ({
         developmentMode,  
@@ -69,9 +70,7 @@ export function useUmConsent() : UmConsentHookReturn {
         onConsentApprove, 
         onConsentReject
     } : InitializeConsentManagerParams) => {
-        console.log("useUmConsent initializeConsentManager run");
         if (consentInitState) {
-            console.log("useUmConsent initializeConsentManager already initialized");
             return;
         }
         const onConsentChange = ({ cookie }: { cookie: any }) => {
@@ -99,9 +98,7 @@ export function useUmConsent() : UmConsentHookReturn {
                 analytics: []
             }
         }
-        const src = 'https://umich.edu/apis/umconsentmanager/consentmanager.js'
-        appendScript(src)
-        console.log("useUmConsent initializeConsentManager complete (initialized).");
+        appendScript(umConsentSrcUrl)
         setConsentInitState(true)
     }
 

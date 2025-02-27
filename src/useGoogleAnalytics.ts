@@ -40,10 +40,6 @@ export function useGoogleAnalytics({
         reject: undefined
     });
     useEffect(() => {
-        console.log('useGoogleAnalytics effect initialized', initialized);
-        console.log('useGoogleAnalytics effect googleAnalyticsId', googleAnalyticsId);
-        console.log('useGoogleAnalytics effect debug', debug);
-        console.log('useGoogleAnalytics effect nonce', nonce);
         if (googleAnalyticsId && !initialized) {
             GoogleAnalytics.gtag("consent", "default", {
                 ad_storage: GoogleAnalyticsConsentValue.Denied,
@@ -65,7 +61,6 @@ export function useGoogleAnalytics({
 
             setConsentHandlers({
                 approve: () => {
-                    console.log('useGoogleAnalytics approve handler run');
                     GoogleAnalytics.gtag("consent", "update", {
                         analytics_storage: GoogleAnalyticsConsentValue.Granted,
                         functional_storage: GoogleAnalyticsConsentValue.Granted,
@@ -77,7 +72,6 @@ export function useGoogleAnalytics({
                     GoogleAnalytics.event({ action: 'um_consent_updated', category: 'consent' });
                 },
                 reject: () => {
-                    console.log('useGoogleAnalytics reject handler run');
                     GoogleAnalytics.gtag("consent", "update", { 
                         analytics_storage: GoogleAnalyticsConsentValue.Granted,
                         functional_storage: GoogleAnalyticsConsentValue.Granted 

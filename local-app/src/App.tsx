@@ -15,7 +15,7 @@ function App(): JSX.Element {
 */
   
   const { gaInitialized, gaHandlers } = useGoogleAnalytics({
-    googleAnalyticsId: '', // your Google Analytics ID
+    googleAnalyticsId: 'G-3F1K6Y7Q6Q', // your Google Analytics ID
     debug: false,
   });
 
