@@ -50,6 +50,7 @@ export type InitializeConsentManagerParams = {
     developmentMode?: boolean,
     alwaysShow?: boolean,
     privacyUrl?: string,
+    rootDomain?: boolean | string,
     onConsentApprove: () => void,
     onConsentReject: () => void,
 }
@@ -67,6 +68,7 @@ export function useUmConsent() : UmConsentHookReturn {
         developmentMode,  
         alwaysShow, 
         privacyUrl, 
+        rootDomain,
         onConsentApprove, 
         onConsentReject
     } : InitializeConsentManagerParams) => {
@@ -85,7 +87,7 @@ export function useUmConsent() : UmConsentHookReturn {
             customManager: {
                 enabled: true,
                 alwaysShow: alwaysShow || false,
-                rootDomain: true,
+                rootDomain: rootDomain || false,
                 preferencePanel: {
                     beforeCategories: true,
                     afterCategories: true
