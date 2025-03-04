@@ -42,7 +42,8 @@ As explained in the [overview](#overview) above, the `useGoogleAnalytics` and `u
 For the U-M consent manager, settings such as `alwaysShow`, `developmentMode`, and `rootDomain` can alter the behavior of the script. Here's a brief breakdown:
 - The `alwaysShow` parameter, if set to `true`, will disable the banner popping up to be geo-location-based. All users for your sites domain will see the banner if an option has not yet been selected. Otherwise the default is `false`.
 - The `developmentMode` parameter, if set to `true` will disable geo-location and sets cookies to lifetime of session for testing purposes.  Banner will always show until choice is made. Otherwise the default is `false` for normal production behavior.
-- The `rootDomain` parameter allows for subdomains to be set to the same consent manager configuration. For example, if your site is vpcomm.umich.edu and you want to share the preferences with publicaffairs.vpcomm.umich.edu then set this value to vpcomm.umich.edu.
+- The `rootDomain` parameter allows for subdomains to be set to the same consent manager configuration. For example, if your site is vpcomm.umich.edu and you want to share the preferences with publicaffairs.vpcomm.umich.edu then set this value to vpcomm.umich.edu. By default if the parameter is undefined, no domain is set.
+
 For more information and examples of variables this script uses, see the (U-M cookie disclosure instructions)[https://vpcomm.umich.edu/resources/cookie-disclosure/].
 
 Here's an example of how this would be executed in an app using `react-router-dom`:
