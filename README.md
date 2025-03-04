@@ -39,7 +39,12 @@ This project was initially built to be released on the Github Package Repository
 
 As explained in the [overview](#overview) above, the `useGoogleAnalytics` and `useUmConsent` hooks will run at the root of the App component. If the application uses `react-router-dom`, be sure that App is a child of the router component `<BrowserRouter>` (usually imported as `Router`). Before the use of the Google Analytics hook, be sure to have the proper Google Analytics Id for the project you are using. 
 
-For the U-M consent manager, settings such as `alwaysShow` and `developmentMode` can alter the behavior of the script. To learn more about these script settings see the [U-M Cookie Disclosure page](https://vpcomm.umich.edu/resources/cookie-disclosure/) under 'Banner Integration'.
+For the U-M consent manager, settings such as `alwaysShow`, `developmentMode`, and `rootDomain` can alter the behavior of the script. Here's a brief breakdown:
+- The `alwaysShow` parameter, if set to `true`, will disable the banner popping up to be geo-location-based. All users for your sites domain will see the banner if an option has not yet been selected. Otherwise the default is `false`.
+- The `developmentMode` parameter, if set to `true` will disable geo-location and sets cookies to lifetime of session for testing purposes.  Banner will always show until choice is made. Otherwise the default is `false` for normal production behavior.
+- The `rootDomain` parameter allows for subdomains to be set to the same consent manager configuration. For example, if your site is vpcomm.umich.edu and you want to share the preferences with publicaffairs.vpcomm.umich.edu then set this value to vpcomm.umich.edu. By default if the parameter is undefined, no domain is set.
+
+For more information and examples of variables this script uses, see the (U-M cookie disclosure instructions)[https://vpcomm.umich.edu/resources/cookie-disclosure/].
 
 Here's an example of how this would be executed in an app using `react-router-dom`:
 
@@ -83,6 +88,7 @@ const App = () => {
     const consentParams = {
       developmentMode: false,
       alwaysShow: false,
+      rootDomain: 'example.site'
       onConsentApprove: gaHandlers.onConsentApprove,
       onConsentReject: gaHandlers.onConsentReject,
     };
@@ -134,6 +140,7 @@ const App: React.FC<AppProps> = ({
         const consentParams: InitializeConsentManagerParams = {
             developmentMode: false,
             alwaysShow: false,
+            rootDomain: 'example.site',
             onConsentApprove: gaHandlers.onConsentApprove,
             onConsentReject: gaHandlers.onConsentReject,
         }
